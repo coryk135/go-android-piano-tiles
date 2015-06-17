@@ -21,29 +21,29 @@ import (
 )
 
 var (
-	program  		gl.Program
-	position 		gl.Attrib
-	offset   		gl.Uniform
-	color    		gl.Uniform
-	buf      		gl.Buffer
+	program  gl.Program
+	position gl.Attrib
+	offset   gl.Uniform
+	color    gl.Uniform
+	buf      gl.Buffer
 
-	tick        	int
-	tiles       	[4]int
-	numTiles    	int
-	key         	int
-	tileWidth   	geom.Pt
-	tileHeight  	geom.Pt
+	tick       int
+	tiles      [4]int
+	numTiles   int
+	key        int
+	tileWidth  geom.Pt
+	tileHeight geom.Pt
 
-	green    		float32
-	touchLoc 		geom.Point
+	green    float32
+	touchLoc geom.Point
 
-	drawChan 		chan string
-	quit     		chan int
+	drawChan chan string
+	quit     chan int
 
-	animating		bool
-	animateUntil	time.Time
-	now				time.Time
-	timeDiff		time.Duration
+	animating    bool
+	animateUntil time.Time
+	now          time.Time
+	timeDiff     time.Duration
 )
 
 // type Square struct {
@@ -68,8 +68,8 @@ func start() {
 	tiles[3] = 3
 	tick = 0
 	numTiles = 4
-	tileWidth = geom.Width/geom.Pt(numTiles)
-	tileHeight = geom.Height/geom.Pt(numTiles)
+	tileWidth = geom.Width / geom.Pt(numTiles)
+	tileHeight = geom.Height / geom.Pt(numTiles)
 	// squares := []Square{Square{0.0, 0.0},
 	//                     Square{0.5, 0.5},
 	//                     Square{1.0, 1.0},
@@ -94,7 +94,6 @@ func start() {
 
 	// TODO(crawshaw): the debug package needs to put GL state init here
 
-
 	drawChan = make(chan string)
 	// go func (){
 	// 	for {
@@ -118,8 +117,8 @@ func stop() {
 func touch(t event.Touch) {
 	touchLoc = t.Loc
 	if t.Type == event.TouchStart {
-		if inbounds(t){
-			tick = (tick+1) % 4
+		if inbounds(t) {
+			tick = (tick + 1) % 4
 			shiftTiles()
 			calcTriangleData()
 			animating = true
@@ -130,7 +129,7 @@ func touch(t event.Touch) {
 	}
 }
 
-func shiftTiles(){
+func shiftTiles() {
 	for i := 0; i < len(tiles)-1; i++ {
 		tiles[i] = tiles[i+1]
 	}
@@ -138,21 +137,27 @@ func shiftTiles(){
 	key = tiles[0]
 }
 
-func calcTriangleData(){
+func calcTriangleData() {
 	t := triangleFloats
 
 	// i is a tile's row (y position)
 	// v is a tile's col (x position)
-	for i,v := range tiles {
-		b := i*6*3
+	for i, v := range tiles {
+		b := i * 6 * 3
 		u := float32(v)
 		j := float32(i)
-		t[b+0]  = 0.0 + 0.5*u; t[b+1]  = 0.5 + 0.5*j // top left
-		t[b+3]  = 0.0 + 0.5*u; t[b+4]  = 0.0 + 0.5*j // bottom left
-		t[b+6]  = 0.5 + 0.5*u; t[b+7]  = 0.0 + 0.5*j // bottom right
-		t[b+9]  = 0.0 + 0.5*u; t[b+10] = 0.5 + 0.5*j // top left
-		t[b+12] = 0.5 + 0.5*u; t[b+13] = 0.5 + 0.5*j // top right
-		t[b+15] = 0.5 + 0.5*u; t[b+16] = 0.0 + 0.5*j // bottom right
+		t[b+0] = 0.0 + 0.5*u
+		t[b+1] = 0.5 + 0.5*j // top left
+		t[b+3] = 0.0 + 0.5*u
+		t[b+4] = 0.0 + 0.5*j // bottom left
+		t[b+6] = 0.5 + 0.5*u
+		t[b+7] = 0.0 + 0.5*j // bottom right
+		t[b+9] = 0.0 + 0.5*u
+		t[b+10] = 0.5 + 0.5*j // top left
+		t[b+12] = 0.5 + 0.5*u
+		t[b+13] = 0.5 + 0.5*j // top right
+		t[b+15] = 0.5 + 0.5*u
+		t[b+16] = 0.0 + 0.5*j // bottom right
 	}
 	triangleData = f32.Bytes(binary.LittleEndian, triangleFloats...)
 	// buf = gl.GenBuffer()
@@ -160,13 +165,13 @@ func calcTriangleData(){
 	gl.BufferData(gl.ARRAY_BUFFER, gl.STATIC_DRAW, triangleData)
 }
 
-func inbounds(t event.Touch) bool{
-	return geom.Pt(key)*tileWidth < t.Loc.X && t.Loc.X < geom.Pt((key+1))*tileWidth// &&
-		//geom.Height > t.Loc.Y && t.Loc.Y > geom.Height - (geom.Pt((0+1))*tileHeight)
+func inbounds(t event.Touch) bool {
+	return geom.Pt(key)*tileWidth < t.Loc.X && t.Loc.X < geom.Pt((key+1))*tileWidth // &&
+	//geom.Height > t.Loc.Y && t.Loc.Y > geom.Height - (geom.Pt((0+1))*tileHeight)
 
 }
 
-func randomKey() int{
+func randomKey() int {
 	return rand.Int() % len(tiles)
 }
 
@@ -191,7 +196,7 @@ func draw() {
 		gl.Uniform2f(offset, float32(-1), float32(timeDiff.Seconds()))
 		// gl.Uniform2f(offset, float32(touchLoc.X/geom.Width), float32(touchLoc.Y/geom.Height))
 	} else {
-		gl.Uniform2f(offset, float32(-1), float32(0a))
+		gl.Uniform2f(offset, float32(-1), float32(0)) //a))
 	}
 	gl.BindBuffer(gl.ARRAY_BUFFER, buf)
 	gl.EnableVertexAttribArray(position)
